@@ -1,0 +1,23 @@
+## Build results
+bin/
+obj/
+
+## Visual Studio
+.vs/
+*.user
+.vsconfig
+
+## Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+## IDE
+.idea/
+.vscode/
+
+## OS
+.DS_Store
+Thumbs.db
