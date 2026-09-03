@@ -8,17 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Configure SQLite
 builder.Services.AddDbContext<LoanDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Configure Rule Engine
 builder.Services.AddScoped<IApplicationRule>(sp =>
 {
     var deniedStates = builder.Configuration.GetSection("DeniedStates").Get<string[]>() ?? new[] { "NY" };
@@ -30,23 +25,13 @@ builder.Services.AddScoped<IApplicationRule>(sp =>
     return new SsnBlacklistRule(blacklistedSsns);
 });
 builder.Services.AddScoped<RuleEngine>();
-
-// Configure Repositories
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
-
-// Configure Event Publisher
 builder.Services.AddSingleton<ApplicationEventPublisher>();
-
-// Configure External Service
 builder.Services.AddHttpClient<IExternalService, ExternalService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ExternalService:BaseUrl"] ?? "http://localhost:3001");
 });
-
-// Configure Background Service
 builder.Services.AddHostedService<ApplicationEventProcessor>();
-
-// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -67,7 +52,6 @@ if (builder.Configuration.GetValue<bool?>("ApplyMigrationsOnStartup") ?? true)
     dbContext.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
